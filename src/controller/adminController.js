@@ -1,5 +1,6 @@
 const adminModel = require('../model/adminModel')
 const userModel = require('../model/userModel')
+const slotModel = require('../model/slotModel')
 const { isValid,isValidRequestBody } = require('../validation/validator');
 const validator = require('validator');
 const jwt = require('jsonwebtoken')
@@ -57,6 +58,13 @@ const adminLogin = async function(req,res){
 
 const getUser = async function(req, res){
     try{
+        const admin = await adminModel.findById(req.userId)
+        if(!admin){
+            return res.status(403).send({
+                status: false,
+                message : "Your not a Admin"
+            })
+        }
 
         const user = await userModel.find()
         const count = await userModel.find().count()
@@ -75,7 +83,75 @@ const getUser = async function(req, res){
     }
 }
 
+const filterUser = async function(req,res){
+    try{
+        const admin = await adminModel.findById(req.userId)
+        if(!admin){
+            return res.status(403).send({
+                status: false,
+                message : "Your not a Admin"
+            })
+        }
+        // console.log(admin)
+        // console.log(req.userId)
+        let filter = {}
+        let {Age, Pincode, Vaccination} = req.query
+        if(Age){
+            filter.Age = Age
+        }
+        if(Pincode){
+            filter.Pincode = Pincode
+        }
+        if(Vaccination){
+            filter.Vaccination = Vaccination
+        }
+
+        const user = await userModel.find(filter)
+
+        res.status(200).send({
+            status : true,
+            message : "Success",
+            data : user
+        })
+
+    }catch(error){
+        res.status(500).send({
+            status : false, 
+            message : error.message
+        })
+    }
+
+}
+
+const getSlot = async function(req,res){
+    try{
+        const admin = await adminModel.findById(req.userId)
+        if(!admin){
+            return res.status(403).send({
+                status: false,
+                message : "Your not a Admin"
+            })
+        }
+
+        const slot = await slotModel.find({date : date})
+        
+        res.status(200).send({
+            status: true,
+            message: "Slot Data fetched",
+            Vaccine_Data: slot
+        })
+
+    }catch(error){
+        res.status(500).send({
+            status : false, 
+            message : error.message
+        })
+    }
+}
+
 module.exports = {
     adminLogin,
-    getUser
+    getUser,
+    getSlot,
+    filterUser
 }
