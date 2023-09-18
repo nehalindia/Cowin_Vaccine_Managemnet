@@ -18,4 +18,15 @@
 <p> In Slot Controller I have implemnted logic where user can check availabilty of slot the Registerd the slot and update the slot according the requiremnt.</p>
 
 <h3> User Controller </h3>
-<p>In user Controller I have implemnted where new user can registerd and login.</p>
+<p>In user Controller I have implemnted where new user can registerd and login also generated JsonWebToken for user. </p>
+
+<h2> MiddleWare</h2>
+<h3> Auth </h3>
+<p> In Auth we verify user token to check authenticity of user, it prevent unauthorize access.</p>
+
+
+<h2>.env</h2>
+<h3> Adding .env file credential here!</h3>
+<p> PORT = 3000 </p>
+<p> MONGO_URI = mongodb+srv://nehaluddindpe:RCGtWC3HqBQUfNeR@cluster0.wzbtyg0.mongodb.net/CowinVaccine?retryWrites=true&w=majority </p>
+<p> JWT_SECRET_KEY = secret-key-for-login </p>
