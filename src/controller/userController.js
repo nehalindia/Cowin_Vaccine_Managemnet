@@ -6,15 +6,16 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config
 
 
+/********* User Registeration API*************/
 const registerUser = async function(req,res){
     try{
-      
+        /**********  Checking null value and undefined value************/
+
         if(!isValidRequestBody(req.body)){
             return res.status(400).send({status :false, message: "Must add data"})
         }
 
         let {Name, PhoneNumber, Age, Pincode, Aadhaar, password} = req.body
-
         if( !isValid(Name) || !isValid(PhoneNumber) || !isValid(Age) && typeof Age !== 'number' || 
         !isValid(Pincode) && typeof Pincode !== 'number' || !isValid(Aadhaar) || !isValid(password) ){
             return res.status(400).send({
@@ -23,6 +24,7 @@ const registerUser = async function(req,res){
             })
         }
 
+        /*****************Validatin passwor length*************/
         password = password.trim()
         if(password.length < 8 || password.length > 15){
             return res.status(400).send({
@@ -31,6 +33,8 @@ const registerUser = async function(req,res){
             })
         }
 
+        /*****************Validatin Phone Number using validator Package,
+         also checked in DB to maintain uniqness of Mobile Number*************/
         PhoneNumber = PhoneNumber.trim()
         if(!validator.isMobilePhone(PhoneNumber)){
             return res.status(400).send({
@@ -38,7 +42,6 @@ const registerUser = async function(req,res){
                 message : "Enter valid Mobile Number"
             })
         }
-
         const phoneExist = await userModel.findOne({PhoneNumber})     
         if(phoneExist){
             return res.status(400).send({
@@ -61,6 +64,7 @@ const registerUser = async function(req,res){
         //     })
         // }
 
+
         const user = await userModel.create(req.body)
 
         res.status(201).send({
@@ -78,8 +82,10 @@ const registerUser = async function(req,res){
 }
 
 
+/************* USer Login API *****************/
 const userLogin = async (req, res) => {
     try{
+         /**********  Checking null value and undefined value************/
         if(!isValidRequestBody(req.body)){
             return res.status(400).send({status :false, message: "Must add data"})
         }
@@ -93,6 +99,8 @@ const userLogin = async (req, res) => {
             })
         }
 
+
+         /*****************Validating Phone Number using validator Package*************/
         if(!validator.isMobilePhone(PhoneNumber)){
             return res.status(400).send({
                 status : false,
@@ -100,6 +108,7 @@ const userLogin = async (req, res) => {
             })
         }
 
+        /*******Checked user and created token for user***********/
         const user = await userModel.findOne({PhoneNumber})
         if(!user){
             return res.status(401).send({

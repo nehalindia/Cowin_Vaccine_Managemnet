@@ -2,7 +2,7 @@ const userModel = require('../model/userModel')
 const slotModel = require('../model/slotModel')
 const { isValid,isValidRequestBody } = require('../validation/validator');
 
-
+/*************** Availibility of Slot **************/
 const availableSlot = async function(req,res){
     try{       
         // const today = new Date();
@@ -10,10 +10,11 @@ const availableSlot = async function(req,res){
         // const mm = String(today.getMonth() + 1).padStart(2, '0')
         // const yyyy = today.getFullYear();
         // const slotDate = `${dd}-${mm}-${yyyy}`;
+
+        /**********  Checking null value and undefined value************/
         if(!isValidRequestBody(req.body)){
             return res.status(400).send({status :false, message: "Must add data"})
         }
-
         const { date } = req.body
         if(!isValid(date)){
             return res.status(400).send({
@@ -22,8 +23,8 @@ const availableSlot = async function(req,res){
             })
         }
         
+        /******* Validating the Date with vaccination Drive ************/
         const date1 = date.split("-")
-
         if(date1[2] != '2021' || date1[1] != '06' || date1[0] < '0' || date1[0] > '31'){
             return res.status(400).send({
                 status : false, 
@@ -32,7 +33,6 @@ const availableSlot = async function(req,res){
         }
         
         const count = await slotModel.find({date : date}).count()
-    
         if(count == 140){
             return res.status(200).send({
                 status : false, 
@@ -40,6 +40,8 @@ const availableSlot = async function(req,res){
             })
         }
 
+
+        /************ Checking available time slot on particular date ***************/
         let arr = []
         let checkSlot = await slotModel.find({date:date, time : "10:00" }).count()
         if(checkSlot < 10) arr.push("10:00")
@@ -84,12 +86,14 @@ const availableSlot = async function(req,res){
     }
 }
 
+
+/******** Register the Slot *************/
 const registerSlot = async (req,res) => {
     try{
+        /**********  Checking null value and undefined value************/
         if(!isValidRequestBody(req.body)){
             return res.status(400).send({status :false, message: "Must add data"})
         }
-
         let { date, time, dose} = req.body
         if(!isValid(date) || !isValid(time) || !isValid(dose)){
             return res.status(400).send({
@@ -98,6 +102,7 @@ const registerSlot = async (req,res) => {
             })
         }
 
+        /******* Validating the Date with vaccination Drive ************/
         const date1 = date.split("-")
         if(date1[2] != '2021' || date1[1] != '06' || date1[0] < '0' || date1[0] > '31'){
             return res.status(400).send({
@@ -105,7 +110,6 @@ const registerSlot = async (req,res) => {
                 message : "Not Valid Date"
             })
         }
-        
         const count = await slotModel.find({date : date}).count()
         if(count == 140){
             return res.status(200).send({
@@ -114,6 +118,7 @@ const registerSlot = async (req,res) => {
             })
         }
 
+        /*********** Checking valid request of Dose *****************/
         let vaccine = await userModel.findById(req.userId)
 
         if(vaccine.vaccination === "none" && dose != "1st"){
@@ -136,6 +141,8 @@ const registerSlot = async (req,res) => {
                 message : "Your 1st dose completed"
             })
         }
+
+        /********** Registered the time slot for vaccine *****************/
         let checkSlot = await slotModel.find({date:date, time : time }).count()
         if(checkSlot < 10){
             req.body.userId = req.userId
@@ -157,8 +164,11 @@ const registerSlot = async (req,res) => {
     }
 }
 
+
+/******** Update Registerd Slot *************/
 const updateSlot = async function(req,res){
     try{
+        /**********  Checking null value and undefined value************/
         if(!isValidRequestBody(req.body)){
             return res.status(400).send({status :false, message: "Must add data"})
         }
@@ -171,6 +181,7 @@ const updateSlot = async function(req,res){
             })
         }
 
+        /******* Validating the Date with vaccination Drive ************/
         const date1 = date.split("-")
         if(date1[2] != '2021' || date1[1] != '06' || date1[0] < '0' || date1[0] > '31'){
             return res.status(400).send({
@@ -178,7 +189,6 @@ const updateSlot = async function(req,res){
                 message : "Not Valid Date"
             })
         }
-        
         const count = await slotModel.find({date : date}).count()
         if(count == 140){
             return res.status(200).send({
@@ -186,6 +196,8 @@ const updateSlot = async function(req,res){
                 message : "Slot not Available"
             })
         }
+
+        /************ Updated the time and date after chceking availability *************/
         let registerdSlot = await slotModel.findOne({userId:req.userId})
 
         let checkSlot = await slotModel.find({date:date, time : time }).count()

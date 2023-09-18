@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config
 
 
+/************* Verify the token of user ***************/
+/*********** It helps protect the Api from unauthorize access ************/
 const authorize = async function(req,res,next){
     let userIdFromParam = req.params.userId
     try {

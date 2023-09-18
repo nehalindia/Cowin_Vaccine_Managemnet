@@ -6,12 +6,14 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken')
 require('dotenv').config
 
+
+/************ Admin Login API **************/
 const adminLogin = async function(req,res){
     try{
+        /**********  Checking null value and undefined value************/
         if(!isValidRequestBody(req.body)){
             return res.status(400).send({status :false, message: "Must add data"})
         }
-        
         let {PhoneNumber, password}= req.body
         
         if(!isValid(PhoneNumber) || !isValid(password)){
@@ -21,6 +23,7 @@ const adminLogin = async function(req,res){
             })
         }
 
+        /*****************Validating Phone Number using validator Package*************/
         if(!validator.isMobilePhone(PhoneNumber)){
             return res.status(400).send({
                 status : false,
@@ -28,6 +31,7 @@ const adminLogin = async function(req,res){
             })
         }
 
+        /*******Checked user and created token for user***********/
         const admin = await adminModel.findOne({PhoneNumber})
         if(!admin){
             return res.status(401).send({
@@ -56,8 +60,10 @@ const adminLogin = async function(req,res){
     }
 }
 
+/******* Get The detail of Registerd User **************/
 const getUser = async function(req, res){
     try{
+        /********* Validating admin *********/
         const admin = await adminModel.findById(req.userId)
         if(!admin){
             return res.status(403).send({
@@ -66,6 +72,7 @@ const getUser = async function(req, res){
             })
         }
 
+        /************ Selecting all Registerd User ************/
         const user = await userModel.find()
         const count = await userModel.find().count()
 
@@ -83,8 +90,10 @@ const getUser = async function(req, res){
     }
 }
 
+/*************** Filter user List  **************/
 const filterUser = async function(req,res){
     try{
+        /********* Validating admin *********/
         const admin = await adminModel.findById(req.userId)
         if(!admin){
             return res.status(403).send({
@@ -92,8 +101,9 @@ const filterUser = async function(req,res){
                 message : "Your not a Admin"
             })
         }
-        // console.log(admin)
-        // console.log(req.userId)
+        
+
+        /********** Creating filter on the base of User Input **************/
         let filter = {}
         let {Age, Pincode, Vaccination} = req.query
         if(Age){
@@ -123,8 +133,10 @@ const filterUser = async function(req,res){
 
 }
 
+/********** get details of all registerd slot ***************/
 const getSlot = async function(req,res){
     try{
+        /********* Validating admin *********/
         const admin = await adminModel.findById(req.userId)
         if(!admin){
             return res.status(403).send({
