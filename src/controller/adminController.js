@@ -133,7 +133,7 @@ const getSlot = async function(req,res){
             })
         }
 
-        const slot = await slotModel.find({date : date})
+        const slot = await slotModel.find(req.body).populate('userId')
         
         res.status(200).send({
             status: true,
